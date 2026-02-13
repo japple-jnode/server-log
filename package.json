@@ -15,8 +15,7 @@
         "JNS",
         "JNodeServer",
         "JustApple",
-        "Cloudflare",
-        "Proxy"
+        "Log"
     ],
     "author": "JustApple <apple@justapple.tw>",
     "license": "Apache-2.0",
