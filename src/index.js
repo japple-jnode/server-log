@@ -214,6 +214,9 @@ class LogRouter {
         ctx.res.once('close', finalize);
         ctx.res.once('error', finalize);
 
+        // make other routers/handlers could control the log time, like WSHandler
+        ctx.finalizeLog = finalize;
+
         return this.next;
     }
 

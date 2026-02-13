@@ -38,15 +38,17 @@ server.listen(8080);
 
 ## How it works?
 
-`LogRouter` is a specialized **router** that sits in front of your application logic. When a request arrives, it records the start time and then passes the request to the `next` router or handler.
+`LogRouter` is a specialized **router** that sits in front of your application logic. When a request arrives, it records the start time and injects a `finalizeLog` function into the `ctx`. It then passes the request to the `next` router or handler.
 
-Once the response is finished (or a timeout is reached), it gathers information about the request (like status code, method, and response time) and outputs it to the console and/or a log file.
+Once the response is finished (or a timeout is reached), it gathers information about the request (such as status code, method, and response time) and outputs it to the console and/or a log file.
 
-------
+---
 
 # Reference
 
-## `log.routerConstructors.Log(next[, options])`
+## Routers
+
+### Router: `Log(next[, options])`
 
 - `next` [router](https://github.com/japple-jnode/server#class-serverrouter) | [handler-extended](https://github.com/japple-jnode/server#handler-extended) The next step in the routing chain.
 - `options` [\<Object\>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
@@ -58,19 +60,16 @@ Once the response is finished (or a timeout is reached), it gathers information 
   - `plainConsoleLog` [\<boolean\>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type) Disable ANSI colors in console output. **Default:** `false`.
   - `sep` [\<string\>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type) The separator between log items. **Default:** `' '` (space).
   - `forceLog` [\<number\>](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type) Timeout in milliseconds to force log if the response hasn't finished. **Default:** `10000`.
-- Returns: [LogRouter](#class-loglogrouter)
 
-## Class: `log.LogRouter`
+Records request metadata and logs it upon completion. It also adds a `ctx.finalizeLog` function, allowing handlers (like WebSocket upgrades) to trigger logging manually before the connection context changes.
 
-- Extends: [server.Router](https://github.com/japple-jnode/server#class-serverrouter)
+The `LogRouter` will add a function `.finalizeLog` into `ctx`, when any of later router/handlers wants to log write away (e.g. the WebSocket-related requests) they could call this.
 
-### `new log.LogRouter(next, options)`
-
-See [`log.routerConstructors.Log(next[, options])`](#logrouterconstructorslognext-options).
+## Log Items
 
 ### Built-in Log Items
 
-These strings can be used in `consoleItems` or `fileItems`:
+These keys can be used in `consoleItems` or `fileItems`:
 
 | Item Key | Description | Example Output |
 | :--- | :--- | :--- |
@@ -84,12 +83,12 @@ These strings can be used in `consoleItems` or `fileItems`:
 | `responseTime`| Request duration | `5ms` (Green/Yellow/Red) |
 | `method` | HTTP method | `GET`, `POST` (Blue) |
 | `statusCode` | HTTP status code | `200`, `404`, `500` (Colored) |
-| `path` | URL pathname | `/api/data` (White) |
-| `url` | Host + URL | `example.com/api/data` (White) |
-| `host` | Hostname | `example.com` (White) |
-| `ip` | Client IP address | `127.0.0.1` (Gray) |
-| `ua` | User-Agent header | `"Mozilla/5.0..."` (Gray) |
-| `referer` | Referer header | `https://google.com/` (Gray) |
+| `path` | URL pathname | `/api/data` |
+| `url` | Host + URL | `example.com/api/data` |
+| `host` | Hostname | `example.com` |
+| `ip` | Client IP address | `127.0.0.1` |
+| `ua` | User-Agent header | `"Mozilla/5.0..."` |
+| `referer` | Referer header | `https://google.com/` |
 | `depth` | Routing step count | `@2` (Cyan) |
 
 ### Custom Log Items
@@ -111,7 +110,7 @@ lr.Log(next, {
   itemRegistery: {
     hello: (time, env, ctx, plain, styled) => {
       plain.push('HELLO');
-      styled.push('\x1b[32mHELLO\x1b[0m');
+      styled.push('\x1b[32mHELLO\x1b[0m'); // Green HELLO
     }
   },
   consoleItems: ['localTime', 'hello', 'path']
