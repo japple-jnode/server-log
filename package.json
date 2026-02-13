@@ -1,0 +1,27 @@
+{
+    "name": "@jnode/server-log",
+    "version": "1.0.0",
+    "description": "Official logger for JNS.",
+    "main": "src/index.js",
+    "scripts": {
+        "test": "echo \"Hello, JNS Logger.\""
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/japple-jnode/server-log.git"
+    },
+    "keywords": [
+        "JustNode",
+        "JNS",
+        "JNodeServer",
+        "JustApple",
+        "Cloudflare",
+        "Proxy"
+    ],
+    "author": "JustApple <apple@justapple.tw>",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/japple-jnode/server-log/issues"
+    },
+    "homepage": "https://github.com/japple-jnode/server-log#readme"
+}
