@@ -7,7 +7,7 @@ by JustApple & Google Gemini
 */
 
 // dependencies
-const fs = require('fs');
+const fs = require('fs/promises');
 const path = require('path');
 
 // default item registery
@@ -220,16 +220,9 @@ class LogRouter {
         return this.next;
     }
 
-    async log(time = new Date(), env, ctx) {
+    log(time = new Date(), env, ctx) {
         const iso = time.toISOString();
         const date = iso.slice(0, 10);
-
-        // if folder is specific
-        if (this.options.folder && this._date !== date) {
-            this._date = date;
-            this._fileStream?.end();
-            this._fileStream = fs.createWriteStream(path.join(this.options.folder, date + '.log'), { flags: 'a' });
-        }
 
         if (!this.options.disableConsoleLog) {
             let plainLog = [];
@@ -242,7 +235,7 @@ class LogRouter {
             console.log(this.options.plainConsoleLog ? plainLog.join(this.options.sep ?? ' ') : styledLog.join(' '));
         }
 
-        if (this._fileHandle) {
+        if (this.options.folder) {
             let plainLog = [];
             let styledLog = [];
 
@@ -250,7 +243,7 @@ class LogRouter {
                 i(time, env, ctx, plainLog, styledLog);
             }
 
-            this._fileStream.write(plainLog.join(this.options.sep ?? ' ') + '\n');
+            fs.appendFile(path.join(this.options.folder, date + '.log'), plainLog.join(this.options.sep ?? ' ') + '\n');
         }
     }
 }
