@@ -150,7 +150,7 @@ const defaultItemRegistery = {
 
 // log router
 class LogRouter {
-    constructor(next, options) {
+    constructor(next, options = {}) {
         this.options = options;
         this.next = next;
 
